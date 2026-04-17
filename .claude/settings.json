@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql -u root -e \"SHOW DATABASES;\")",
+      "Bash(mysql --user=root --password=\"\" -e \"SHOW DATABASES;\")",
+      "Bash(mysql --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(mysql -u root -e \"CREATE DATABASE IF NOT EXISTS soccer_club_payment CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(mysql -u root --password=\"\" -e \"CREATE DATABASE IF NOT EXISTS soccer_club_payment CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;\")",
+      "Bash(mysql_config_editor print *)",
+      "Bash(composer require *)",
+      "Bash(php artisan *)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Http/Controllers/Auth/LoginController.php)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Http/Middleware/RoleMiddleware.php)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Models/User.php)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Models/Payment.php)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Http/Controllers/Member/PaymentController.php)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Http/Controllers/Webhook/StripeController.php)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/config/stripe.php)",
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/routes/web.php)"
+    ]
+  }
+}

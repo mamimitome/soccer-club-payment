@@ -1,0 +1,74 @@
+/*
+ * =============================================
+ * サッカークラブ管理システム - メインCSS
+ * =============================================
+ *
+ * Tailwind CSS v4 を使用しています。
+ * @import 'tailwindcss' と書くだけで全ユーティリティクラスが使えます。
+ * （v3以前の tailwind.config.js は不要になりました）
+ */
+@import 'tailwindcss';
+
+/*
+ * @source ディレクティブ
+ * Tailwindがクラス名を検出するファイルの場所を指定します。
+ * ここに指定されたファイルを自動スキャンして、使われているクラスのみCSSを生成します。
+ * （使われていないクラスのCSSは生成されないので、ファイルサイズが小さくなります）
+ */
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/*
+ * @theme ディレクティブ
+ * プロジェクト独自のデザイントークン（色・フォントなど）を定義します。
+ * ここで定義した値は、Tailwindのクラス名として使えます。
+ * 例: bg-club-green → サッカークラブのグリーンカラー
+ */
+@theme {
+    /*
+     * フォント設定
+     * Noto Sans JPを先に指定することで、日本語が正しく表示されます。
+     */
+    --font-sans: 'Noto Sans JP', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /*
+     * サッカークラブのブランドカラー
+     *
+     * カラー命名規則:
+     * --color-{名前}-{濃さ}
+     * 濃さは 50（薄い）〜 950（濃い）の段階があります。
+     *
+     * 使い方の例:
+     * bg-club-green-600  → 背景色をグリーンに
+     * text-club-green-700 → テキストをダークグリーンに
+     * border-club-green-500 → ボーダーをグリーンに
+     */
+
+    /* メインカラー：グリーン（サッカーフィールドをイメージ） */
+    --color-club-green-50: #f0fdf4;
+    --color-club-green-100: #dcfce7;
+    --color-club-green-200: #bbf7d0;
+    --color-club-green-300: #86efac;
+    --color-club-green-400: #4ade80;
+    --color-club-green-500: #22c55e;
+    --color-club-green-600: #16a34a;
+    --color-club-green-700: #15803d;
+    --color-club-green-800: #166534;
+    --color-club-green-900: #14532d;
+    --color-club-green-950: #052e16;
+
+    /* アクセントカラー：ゴールドアンバー（トロフィー・勝利をイメージ） */
+    --color-club-gold-50: #fffbeb;
+    --color-club-gold-100: #fef3c7;
+    --color-club-gold-200: #fde68a;
+    --color-club-gold-300: #fcd34d;
+    --color-club-gold-400: #fbbf24;
+    --color-club-gold-500: #f59e0b;
+    --color-club-gold-600: #d97706;
+    --color-club-gold-700: #b45309;
+    --color-club-gold-800: #92400e;
+    --color-club-gold-900: #78350f;
+}
