@@ -8,11 +8,22 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
     {{-- ページヘッダー --}}
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold text-gray-900">管理ダッシュボード</h1>
-        <p class="mt-1 text-sm text-gray-500">
-            {{ now()->format('Y年m月d日') }} 時点の状況
-        </p>
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">管理ダッシュボード</h1>
+            <p class="mt-1 text-sm text-gray-500">
+                {{ now()->format('Y年m月d日') }} 時点の状況
+            </p>
+        </div>
+        {{-- 会員管理へのショートカットリンク --}}
+        <a href="{{ route('admin.members.index') }}"
+           class="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            会員管理
+        </a>
     </div>
 
     {{-- =============================================

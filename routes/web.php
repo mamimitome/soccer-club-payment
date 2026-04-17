@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\MemberController as AdminMemberController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\PaymentController as MemberPaymentController;
 use App\Http\Controllers\Visitor\PayController;
@@ -85,6 +86,65 @@ Route::prefix('admin')                          // URL を /admin/... にする
          */
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])
             ->name('dashboard');
+
+        // =============================================
+        // 会員管理 CRUD ルート
+        // =============================================
+        // Route::resource を使わずに個別定義する理由：
+        // - ルートモデルバインディングのパラメーター名を {member} にしたいため
+        // - 各ルートに日本語コメントを付けやすくするため
+
+        /**
+         * 会員一覧
+         * GET /admin/members → AdminMemberController@index
+         * route名: 'admin.members.index'
+         */
+        Route::get('/members', [AdminMemberController::class, 'index'])
+            ->name('members.index');
+
+        /**
+         * 会員追加フォームの表示
+         * GET /admin/members/create → AdminMemberController@create
+         * route名: 'admin.members.create'
+         *
+         * ※ /members/{member} より先に定義しないと "create" が {member} にマッチしてしまう
+         */
+        Route::get('/members/create', [AdminMemberController::class, 'create'])
+            ->name('members.create');
+
+        /**
+         * 会員追加の保存処理
+         * POST /admin/members → AdminMemberController@store
+         * route名: 'admin.members.store'
+         */
+        Route::post('/members', [AdminMemberController::class, 'store'])
+            ->name('members.store');
+
+        /**
+         * 会員編集フォームの表示
+         * GET /admin/members/{member}/edit → AdminMemberController@edit
+         * route名: 'admin.members.edit'
+         *
+         * {member} : ルートモデルバインディング（URLのIDからUserモデルを自動取得）
+         */
+        Route::get('/members/{member}/edit', [AdminMemberController::class, 'edit'])
+            ->name('members.edit');
+
+        /**
+         * 会員情報の更新処理
+         * PUT /admin/members/{member} → AdminMemberController@update
+         * route名: 'admin.members.update'
+         */
+        Route::put('/members/{member}', [AdminMemberController::class, 'update'])
+            ->name('members.update');
+
+        /**
+         * 会員の削除処理
+         * DELETE /admin/members/{member} → AdminMemberController@destroy
+         * route名: 'admin.members.destroy'
+         */
+        Route::delete('/members/{member}', [AdminMemberController::class, 'destroy'])
+            ->name('members.destroy');
     });
 
 // =============================================
