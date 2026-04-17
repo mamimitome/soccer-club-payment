@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
 use App\Http\Controllers\Admin\VisitorPayController as AdminVisitorPayController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\PaymentController as MemberPaymentController;
@@ -94,6 +95,16 @@ Route::prefix('admin')                          // URL を /admin/... にする
         // Route::resource を使わずに個別定義する理由：
         // - ルートモデルバインディングのパラメーター名を {member} にしたいため
         // - 各ルートに日本語コメントを付けやすくするため
+
+        /**
+         * 支払い状況一覧
+         * GET /admin/payments → AdminPaymentController@index
+         * route名: 'admin.payments'
+         *
+         * ?year=YYYY&month=MM で表示月を切り替えられる（省略時は当月）
+         */
+        Route::get('/payments', [AdminPaymentController::class, 'index'])
+            ->name('payments');
 
         /**
          * 会員一覧
