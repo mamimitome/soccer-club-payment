@@ -18,7 +18,8 @@
       "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Http/Controllers/Member/PaymentController.php)",
       "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Http/Controllers/Webhook/StripeController.php)",
       "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/config/stripe.php)",
-      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/routes/web.php)"
+      "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/routes/web.php)",
+      "Bash(php -r ' *)"
     ]
   }
 }

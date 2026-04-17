@@ -175,21 +175,15 @@
  *    e. ダッシュボードにリダイレクト
  */
 
-// =============================================
-// 1. Stripe.js の初期化
-// =============================================
-
-// Stripe() の引数は「公開可能キー」（pk_test_... で始まるもの）
-// Bladeの {{ }} でPHPの変数をJavaScriptに渡す
-// @json() でエスケープ処理（XSS対策）
-// @json() : PHP変数をJavaScriptで安全に使えるJSON形式に変換する（XSS対策）
-const stripe = Stripe(@json($stripeKey));
+const stripe = Stripe('{{ $stripeKey }}');
 
 /**
  * Stripe Elements の初期化
  * Elements = カード入力フォームのUIコンポーネント
  */
-const elements = stripe.elements();
+// locale は elements() に渡す必要がある（create() では指定不可）
+// 'ja' を指定するとStripeのエラーメッセージが日本語で表示される
+const elements = stripe.elements({ locale: 'ja' });
 
 /**
  * カード入力フィールドの作成と設定
@@ -215,8 +209,6 @@ const cardElement = elements.create('card', {
             iconColor: '#ef4444',
         },
     },
-    // ロケールを日本語に（エラーメッセージが日本語で表示される）
-    locale: 'ja',
 });
 
 // id="card-element" のdivにカード入力フォームを埋め込む
