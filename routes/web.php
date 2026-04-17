@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\MemberController as AdminMemberController;
+use App\Http\Controllers\Admin\VisitorPayController as AdminVisitorPayController;
 use App\Http\Controllers\Member\DashboardController as MemberDashboardController;
 use App\Http\Controllers\Member\PaymentController as MemberPaymentController;
 use App\Http\Controllers\Visitor\PayController;
@@ -145,6 +146,36 @@ Route::prefix('admin')                          // URL を /admin/... にする
          */
         Route::delete('/members/{member}', [AdminMemberController::class, 'destroy'])
             ->name('members.destroy');
+
+        // =============================================
+        // ビジター代行決済ルート（管理者専用）
+        // =============================================
+
+        /**
+         * ビジター代行決済フォームの表示
+         * GET /admin/visitor/pay → AdminVisitorPayController@index
+         * route名: 'admin.visitor.pay'
+         *
+         * ?visitor_id=xxx で対象ビジターを指定できる
+         */
+        Route::get('/visitor/pay', [AdminVisitorPayController::class, 'index'])
+            ->name('visitor.pay');
+
+        /**
+         * ビジター代行PaymentIntentの作成（AJAXエンドポイント）
+         * POST /admin/visitor/payment/intent → AdminVisitorPayController@createPaymentIntent
+         * route名: 'admin.visitor.payment.intent'
+         */
+        Route::post('/visitor/payment/intent', [AdminVisitorPayController::class, 'createPaymentIntent'])
+            ->name('visitor.payment.intent');
+
+        /**
+         * ビジター代行決済完了の記録（AJAXエンドポイント）
+         * POST /admin/visitor/payment/complete → AdminVisitorPayController@complete
+         * route名: 'admin.visitor.payment.complete'
+         */
+        Route::post('/visitor/payment/complete', [AdminVisitorPayController::class, 'complete'])
+            ->name('visitor.payment.complete');
     });
 
 // =============================================
@@ -209,6 +240,28 @@ Route::prefix('visitor')
          */
         Route::get('/pay', [PayController::class, 'index'])
             ->name('pay');
+
+        /**
+         * ビジターPaymentIntentの作成（AJAXエンドポイント）
+         * POST /visitor/payment/intent → PayController@createPaymentIntent
+         * route名: 'visitor.payment.intent'
+         *
+         * フロントエンドのStripe.jsが決済を開始するために呼ぶエンドポイント。
+         * JSONでclient_secretを返す。
+         */
+        Route::post('/payment/intent', [PayController::class, 'createPaymentIntent'])
+            ->name('payment.intent');
+
+        /**
+         * ビジター決済完了の記録（AJAXエンドポイント）
+         * POST /visitor/payment/complete → PayController@complete
+         * route名: 'visitor.payment.complete'
+         *
+         * Stripe.jsが決済を完了させた後に呼ぶエンドポイント。
+         * DBに成功を記録する。
+         */
+        Route::post('/payment/complete', [PayController::class, 'complete'])
+            ->name('payment.complete');
     });
 
 // =============================================
