@@ -19,7 +19,10 @@
       "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/app/Http/Controllers/Webhook/StripeController.php)",
       "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/config/stripe.php)",
       "Bash(php -l /Users/mitomex/Desktop/soccer-club-payment/routes/web.php)",
-      "Bash(php -r ' *)"
+      "Bash(php -r ' *)",
+      "Bash(git add *)",
+      "Bash(git commit -m '修正: 本番環境のリバースプロキシ設定を追加 *)",
+      "Bash(git push *)"
     ]
   }
 }
