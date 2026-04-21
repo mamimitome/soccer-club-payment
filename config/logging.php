@@ -54,7 +54,19 @@ return [
 
         'stack' => [
             'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            // デフォルトで single（ファイル）と stderr（標準エラー出力）の両方に書き込む
+            //
+            // なぜ stderr を追加するのか？
+            // Railway（本番環境）はコンテナ内のファイル（storage/logs/laravel.log）を
+            // Logs パネルに表示しません。Railway が表示するのは stdout / stderr のみです。
+            // single だけだと、Laravel のログが Railway のログ画面に一切出てこないため
+            // エラー調査が不可能になります。
+            //
+            // stderr チャンネルは php://stderr に書き込み → Railway の Logs パネルに表示される
+            // single チャンネルは storage/logs/laravel.log に書き込み → ローカル開発で参照できる
+            //
+            // 環境変数 LOG_STACK で上書き可能（例: LOG_STACK=stderr のみにする場合）
+            'channels' => explode(',', (string) env('LOG_STACK', 'single,stderr')),
             'ignore_exceptions' => false,
         ],
 
