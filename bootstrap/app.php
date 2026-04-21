@@ -37,9 +37,10 @@ return Application::configure(basePath: dirname(__DIR__))
          */
         $middleware->trustProxies(
             at: '*',
-            headers: Request::HEADER_X_FORWARDED_FOR |
-                     Request::HEADER_X_FORWARDED_PROTO |
-                     Request::HEADER_X_FORWARDED_HOST,
+            headers: Request::HEADER_X_FORWARDED_FOR   // クライアントの実際のIPアドレス
+                   | Request::HEADER_X_FORWARDED_PROTO // https / http の判定（CSRF・セッションCookieのSecureフラグに影響）
+                   | Request::HEADER_X_FORWARDED_HOST  // クライアントが要求したホスト名
+                   | Request::HEADER_X_FORWARDED_PORT, // ポート番号（URLリダイレクト生成に影響）
         );
 
         /**
@@ -87,5 +88,30 @@ return Application::configure(basePath: dirname(__DIR__))
         });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        /**
+         * 本番環境用：例外の詳細をログに記録する
+         *
+         * なぜ必要？
+         * APP_DEBUG=false の本番環境では、エラーの詳細がブラウザに表示されず
+         * 「500 Server Error」しか表示されません。
+         * しかし Railway のログ（Deployments → Logs）には詳細が残ります。
+         * このコードにより、例外クラス名・メッセージ・発生箇所がログに出力され、
+         * 原因調査が可能になります。
+         *
+         * ログの確認方法:
+         *   Railway ダッシュボード → プロジェクト → Deployments → 最新デプロイ → Logs
+         *   または: php artisan log:watch（ローカル）
+         */
+        $exceptions->report(function (\Throwable $e) {
+            // report() は例外を Laravel の標準ログに記録するコールバック
+            // ここでは例外の種類・メッセージ・ファイル・行番号をログに出力する
+            \Illuminate\Support\Facades\Log::error(
+                '[500エラー詳細] ' . get_class($e) . ': ' . $e->getMessage(),
+                [
+                    'file'  => $e->getFile(),   // 例外が発生したファイルパス
+                    'line'  => $e->getLine(),   // 例外が発生した行番号
+                    'trace' => $e->getTraceAsString(), // スタックトレース
+                ]
+            );
+        });
     })->create();
