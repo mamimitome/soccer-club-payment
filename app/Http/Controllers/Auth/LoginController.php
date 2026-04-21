@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 /**
  * ログイン・ログアウトを管理するコントローラー
@@ -61,63 +62,129 @@ class LoginController extends Controller
     public function login(Request $request)
     {
         // =============================================
-        // バリデーション（入力値の検証）
+        // デバッグ用：リクエスト情報をログに記録
         // =============================================
-        // ユーザーが入力した値が正しい形式かチェックします。
-        // バリデーションに失敗すると、自動的にエラーメッセージが表示されます。
-        $request->validate([
-            // email: 必須 / 文字列 / メールアドレス形式
-            'email'    => ['required', 'string', 'email'],
-            // password: 必須 / 文字列
-            'password' => ['required', 'string'],
-        ], [
-            // エラーメッセージを日本語にカスタマイズ
-            'email.required'    => 'メールアドレスを入力してください',
-            'email.email'       => 'メールアドレスの形式で入力してください',
-            'password.required' => 'パスワードを入力してください',
+        // Railway のログ（Deployments → Logs）で確認できます。
+        // 本番環境で500エラーが発生した場合、どのステップで失敗したかを特定するために使います。
+        Log::info('[ログイン開始]', [
+            // リクエストの送信元IPアドレス
+            // TrustProxies 設定後は X-Forwarded-For ヘッダーから実際のIPが取れるはず
+            'ip'         => $request->ip(),
+
+            // https/http どちらで来ているかを確認（セッションCookieのSecureフラグに関係）
+            'is_secure'  => $request->secure(),
+
+            // セッションドライバーの種類（database / file など）
+            // SESSION_DRIVER=database の場合、sessions テーブルが必要
+            'session_driver' => config('session.driver'),
+
+            // メールアドレス（デバッグ後は削除すること）
+            'email'      => $request->input('email'),
         ]);
 
-        // =============================================
-        // 認証処理
-        // =============================================
-        // Auth::attempt() は以下の処理を一括で行います：
-        // 1. メールアドレスでユーザーを検索
-        // 2. 入力されたパスワードと保存済みのハッシュを比較
-        // 3. 一致すればセッションにログイン情報を保存
-        //
-        // 'remember' => true の場合、「ログインを保持」（ブラウザを閉じても維持）
-        $credentials = $request->only('email', 'password');
-        $remember    = $request->boolean('remember'); // チェックボックスの値
-
-        if (Auth::attempt($credentials, $remember)) {
+        try {
             // =============================================
-            // ログイン成功
+            // バリデーション（入力値の検証）
             // =============================================
+            // ユーザーが入力した値が正しい形式かチェックします。
+            // バリデーションに失敗すると、自動的にエラーメッセージが表示されます。
+            $request->validate([
+                // email: 必須 / 文字列 / メールアドレス形式
+                'email'    => ['required', 'string', 'email'],
+                // password: 必須 / 文字列
+                'password' => ['required', 'string'],
+            ], [
+                // エラーメッセージを日本語にカスタマイズ
+                'email.required'    => 'メールアドレスを入力してください',
+                'email.email'       => 'メールアドレスの形式で入力してください',
+                'password.required' => 'パスワードを入力してください',
+            ]);
 
-            // セッション固定攻撃（Session Fixation Attack）を防ぐため
-            // ログイン後はセッションIDを再生成します。
-            // これはセキュリティの基本的な対策です。
-            $request->session()->regenerate();
+            Log::info('[ログイン] バリデーション通過');
 
-            // ログインしたユーザーを取得
-            $user = Auth::user();
+            // =============================================
+            // 認証処理
+            // =============================================
+            // Auth::attempt() は以下の処理を一括で行います：
+            // 1. メールアドレスでユーザーを検索
+            // 2. 入力されたパスワードと保存済みのハッシュを比較
+            // 3. 一致すればセッションにログイン情報を保存
+            //
+            // 'remember' => true の場合、「ログインを保持」（ブラウザを閉じても維持）
+            $credentials = $request->only('email', 'password');
+            $remember    = $request->boolean('remember'); // チェックボックスの値
 
-            // ロールに応じた画面にリダイレクト
-            // 例: admin → /admin/dashboard
-            return redirect($this->getRedirectUrl($user));
+            Log::info('[ログイン] Auth::attempt 実行前');
+
+            $result = Auth::attempt($credentials, $remember);
+
+            Log::info('[ログイン] Auth::attempt 実行後', ['result' => $result]);
+
+            if ($result) {
+                // =============================================
+                // ログイン成功
+                // =============================================
+
+                Log::info('[ログイン] セッション再生成前');
+
+                // セッション固定攻撃（Session Fixation Attack）を防ぐため
+                // ログイン後はセッションIDを再生成します。
+                // これはセキュリティの基本的な対策です。
+                $request->session()->regenerate();
+
+                Log::info('[ログイン] セッション再生成完了');
+
+                // ログインしたユーザーを取得
+                $user = Auth::user();
+
+                Log::info('[ログイン] 認証成功 → リダイレクト', [
+                    'user_id'  => $user->id,
+                    'role'     => $user->role,
+                    'redirect' => $this->getRedirectUrl($user),
+                ]);
+
+                // ロールに応じた画面にリダイレクト
+                // 例: admin → /admin/dashboard
+                return redirect($this->getRedirectUrl($user));
+            }
+
+            Log::info('[ログイン] 認証失敗（メール or パスワードが違う）');
+
+            // =============================================
+            // ログイン失敗
+            // =============================================
+            // withErrors() : エラーメッセージを次の画面に渡す
+            // onlyInput()  : 入力値を保持（パスワードは除く）
+            // ※セキュリティのため「どちらが間違っているか」は教えない
+            return back()
+                ->withErrors([
+                    'email' => 'メールアドレスまたはパスワードが正しくありません',
+                ])
+                ->onlyInput('email'); // メールアドレスだけ再入力状態にする（パスワードはクリア）
+
+        } catch (\Throwable $e) {
+            // =============================================
+            // 予期しない例外のキャッチ
+            // =============================================
+            // Auth::attempt() や session()->regenerate() など、
+            // 各ステップで例外が発生した場合にここで捕捉します。
+            //
+            // よくある原因：
+            // - sessions テーブルが存在しない（SESSION_DRIVER=database の場合）
+            // - DB 接続が確立できない
+            // - APP_KEY が設定されていない（セッション暗号化に必要）
+            Log::error('[ログイン] 例外発生', [
+                'class'   => get_class($e),      // 例外クラス名（例: PDOException）
+                'message' => $e->getMessage(),    // エラーメッセージ
+                'file'    => $e->getFile(),       // 発生ファイル
+                'line'    => $e->getLine(),       // 発生行番号
+                'trace'   => $e->getTraceAsString(), // スタックトレース
+            ]);
+
+            // 500エラーとして再スローする
+            // （bootstrap/app.php の withExceptions でも記録されます）
+            throw $e;
         }
-
-        // =============================================
-        // ログイン失敗
-        // =============================================
-        // withErrors() : エラーメッセージを次の画面に渡す
-        // onlyInput()  : 入力値を保持（パスワードは除く）
-        // ※セキュリティのため「どちらが間違っているか」は教えない
-        return back()
-            ->withErrors([
-                'email' => 'メールアドレスまたはパスワードが正しくありません',
-            ])
-            ->onlyInput('email'); // メールアドレスだけ再入力状態にする（パスワードはクリア）
     }
 
     /**
