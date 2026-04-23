@@ -45,9 +45,9 @@ return new class extends Migration
              * 存在しないuser_idが入るのを防ぎます。
              */
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete()
-                  ->comment('決済したユーザーのID（usersテーブルのidを参照）');
+                ->constrained('users')
+                ->cascadeOnDelete()
+                ->comment('決済したユーザーのID（usersテーブルのidを参照）');
 
             /**
              * payment_type: 決済の種類
@@ -57,7 +57,7 @@ return new class extends Migration
              * refund       : 返金処理
              */
             $table->enum('payment_type', ['monthly_fee', 'visitor_fee', 'refund'])
-                  ->comment('決済種別: monthly_fee=月謝, visitor_fee=ビジター料金, refund=返金');
+                ->comment('決済種別: monthly_fee=月謝, visitor_fee=ビジター料金, refund=返金');
 
             /**
              * amount: 決済金額（円）
@@ -71,7 +71,7 @@ return new class extends Migration
              * Stripeも日本円は最小通貨単位（円）で扱います。
              */
             $table->unsignedInteger('amount')
-                  ->comment('決済金額（円）: 月謝=9000, ビジター=2500');
+                ->comment('決済金額（円）: 月謝=9000, ビジター=2500');
 
             /**
              * status: 決済のステータス（状態）
@@ -82,8 +82,8 @@ return new class extends Migration
              * refunded  : 返金済み
              */
             $table->enum('status', ['pending', 'succeeded', 'failed', 'refunded'])
-                  ->default('pending')
-                  ->comment('決済状態: pending=処理中, succeeded=成功, failed=失敗, refunded=返金済み');
+                ->default('pending')
+                ->comment('決済状態: pending=処理中, succeeded=成功, failed=失敗, refunded=返金済み');
 
             /**
              * stripe_payment_intent_id: StripeのPaymentIntentID
@@ -100,9 +100,9 @@ return new class extends Migration
              * nullable(): Stripe決済前はIDがないためNULLを許可
              */
             $table->string('stripe_payment_intent_id')
-                  ->nullable()
-                  ->unique()
-                  ->comment('StripeのPaymentIntentID（決済ごとに発行される一意のID）');
+                ->nullable()
+                ->unique()
+                ->comment('StripeのPaymentIntentID（決済ごとに発行される一意のID）');
 
             /**
              * stripe_charge_id: StripeのChargeID
@@ -112,8 +112,8 @@ return new class extends Migration
              * 返金処理などに使用します。
              */
             $table->string('stripe_charge_id')
-                  ->nullable()
-                  ->comment('StripeのChargeID（決済完了後に発行）');
+                ->nullable()
+                ->comment('StripeのChargeID（決済完了後に発行）');
 
             /**
              * billing_month: 請求対象月（正会員の月謝用）
@@ -125,8 +125,8 @@ return new class extends Migration
              * nullable(): ビジター料金には請求月がないためNULLを許可
              */
             $table->date('billing_month')
-                  ->nullable()
-                  ->comment('請求対象月（月謝の場合: 例 2026-04-01 = 4月分）');
+                ->nullable()
+                ->comment('請求対象月（月謝の場合: 例 2026-04-01 = 4月分）');
 
             /**
              * paid_at: 実際に決済が完了した日時
@@ -136,8 +136,8 @@ return new class extends Migration
              * nullable(): 決済完了前はNULL
              */
             $table->timestamp('paid_at')
-                  ->nullable()
-                  ->comment('決済完了日時（Stripeから成功通知を受けた日時）');
+                ->nullable()
+                ->comment('決済完了日時（Stripeから成功通知を受けた日時）');
 
             /**
              * failure_reason: 決済失敗の理由
@@ -147,8 +147,8 @@ return new class extends Migration
              * nullable(): 成功した場合はNULL
              */
             $table->string('failure_reason')
-                  ->nullable()
-                  ->comment('決済失敗の理由（例: カードの有効期限切れ）');
+                ->nullable()
+                ->comment('決済失敗の理由（例: カードの有効期限切れ）');
 
             /**
              * notes: メモ・備考
@@ -157,8 +157,8 @@ return new class extends Migration
              * text型は長いテキストを保存できます（string型より長い文字数対応）。
              */
             $table->text('notes')
-                  ->nullable()
-                  ->comment('管理者メモ・備考（任意）');
+                ->nullable()
+                ->comment('管理者メモ・備考（任意）');
 
             /**
              * created_at: レコード作成日時

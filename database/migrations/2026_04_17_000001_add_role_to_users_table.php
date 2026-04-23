@@ -22,6 +22,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+
+        //既存のテーブルに「列を追加」
         Schema::table('users', function (Blueprint $table) {
             /**
              * roleカラムの追加
@@ -40,9 +42,9 @@ return new class extends Migration
              * after('password') : passwordカラムの直後に配置（見やすくするため）
              */
             $table->enum('role', ['admin', 'member', 'visitor'])
-                  ->default('member')
-                  ->after('password')
-                  ->comment('ユーザーの役割: admin=管理者, member=正会員(月謝9000円), visitor=ビジター(都度払い2500円)');
+                ->default('member')
+                ->after('password')
+                ->comment('ユーザーの役割: admin=管理者, member=正会員(月謝9000円), visitor=ビジター(都度払い2500円)');
 
             /**
              * phone（電話番号）カラムの追加
@@ -55,9 +57,9 @@ return new class extends Migration
              * ハイフン(-)が含まれるためstring型にしています。
              */
             $table->string('phone', 20)
-                  ->nullable()
-                  ->after('role')
-                  ->comment('電話番号（任意）');
+                ->nullable()
+                ->after('role')
+                ->comment('電話番号（任意）');
 
             /**
              * stripe_customer_id（StripeのカスタマーID）カラムの追加
@@ -68,9 +70,9 @@ return new class extends Migration
              * 例: "cus_NffrFeUfNV2Hib"
              */
             $table->string('stripe_customer_id')
-                  ->nullable()
-                  ->after('phone')
-                  ->comment('StripeのカスタマーID（決済情報の紐付けに使用）');
+                ->nullable()
+                ->after('phone')
+                ->comment('StripeのカスタマーID（決済情報の紐付けに使用）');
         });
     }
 
